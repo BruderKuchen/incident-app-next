@@ -1,8 +1,9 @@
+// pages/index.js
 import { useState } from 'react';
 
 export default function Home() {
-  const [form, setForm] = useState({ name: '', email: '', message: '' });
-  const [status, setStatus] = useState(null);
+  const [form, setForm] = useState({ title: '', description: '', category: '' });
+  const [statusMsg, setStatusMsg] = useState('');
 
   const handleChange = e => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -10,24 +11,53 @@ export default function Home() {
 
   const handleSubmit = async e => {
     e.preventDefault();
+    setStatusMsg('… speichere');
     const res = await fetch('/api/report', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form),
+      body: JSON.stringify(form)
     });
     const data = await res.json();
-    setStatus(data.message || data.error);
+    setStatusMsg(data.message || data.error);
+    if (res.ok) setForm({ title: '', description: '', category: '' });
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow-md w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+      <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow-md w-full max-w-lg">
         <h1 className="text-2xl font-bold mb-4">Incident melden</h1>
-        <input name="name" onChange={handleChange} placeholder="Name" className="mb-2 w-full p-2 border" required />
-        <input name="email" onChange={handleChange} placeholder="E-Mail" className="mb-2 w-full p-2 border" required />
-        <textarea name="message" onChange={handleChange} placeholder="Nachricht" className="mb-2 w-full p-2 border" required />
-        <button type="submit" className="bg-blue-500 text-white px-4 py-2">Senden</button>
-        {status && <p className="mt-2">{status}</p>}
+        <input
+          name="title"
+          value={form.title}
+          onChange={handleChange}
+          placeholder="Titel"
+          className="mb-2 w-full p-2 border rounded"
+          required
+        />
+        <textarea
+          name="description"
+          value={form.description}
+          onChange={handleChange}
+          placeholder="Beschreibung"
+          className="mb-2 w-full p-2 border rounded"
+          required
+        />
+        <select
+          name="category"
+          value={form.category}
+          onChange={handleChange}
+          className="mb-4 w-full p-2 border rounded"
+          required
+        >
+          <option value="">Kategorie wählen</option>
+          <option value="Phishing">Phishing</option>
+          <option value="Malware">Malware</option>
+          <option value="Datenverlust">Datenverlust</option>
+        </select>
+        <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded">
+          Speichern
+        </button>
+        {statusMsg && <p className="mt-2 text-center">{statusMsg}</p>}
       </form>
     </div>
   );
