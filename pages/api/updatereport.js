@@ -4,7 +4,7 @@ import { MongoClient, ObjectId } from 'mongodb';
 const uri = process.env.MONGODB_URI;
 
 export default async function handler(req, res) {
-  // 1) Preflight OPTIONS beantworten
+  // 1) Preflight OPTIONS abfangen
   if (req.method === 'OPTIONS') {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS');
@@ -12,7 +12,7 @@ export default async function handler(req, res) {
     return res.status(200).json({});
   }
 
-  // 2) CORS-Header für POST
+  // 2) CORS-Header für alle POST-Antworten
   res.setHeader('Access-Control-Allow-Origin', '*');
 
   // 3) Nur POST zulassen
@@ -21,13 +21,13 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: `Method ${req.method} Not Allowed` });
   }
 
-  // 4) Request-Body prüfen
+  // 4) Body prüfen
   const { id, status } = req.body;
   if (!id || !status) {
     return res.status(400).json({ error: 'Missing id or status' });
   }
 
-  // 5) Datenbank-Update
+  // 5) Status updaten
   try {
     const client = new MongoClient(uri);
     await client.connect();
