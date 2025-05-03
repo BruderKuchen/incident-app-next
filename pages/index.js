@@ -12,16 +12,32 @@ export default function Home() {
   const handleSubmit = async e => {
     e.preventDefault();
     setStatusMsg('… speichere');
-    const res = await fetch('/api/report', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form)
-    });
-    const data = await res.json();
-    setStatusMsg(data.message || data.error);
-    if (res.ok) setForm({ title: '', description: '', category: '' });
-  };
-
+  
+    try {
+      const res = await fetch('/api/report', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form)
+      });
+  
+      // Prüfe HTTP-Status
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        console.error('API-Fehler:', err);
+        setStatusMsg(err.error || `Fehler ${res.status}`);
+        return;
+      }
+  
+      const data = await res.json();
+      console.log('API-Erfolg:', data);
+      setStatusMsg(data.message || 'Gespeichert!');
+      setForm({ title: '', description: '', category: '' });
+  
+    } catch (networkError) {
+      console.error('Netzwerkfehler:', networkError);
+      setStatusMsg('Netzwerkfehler – bitte prüfe Konsole');
+    }
+  };  
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
       <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow-md w-full max-w-lg">
