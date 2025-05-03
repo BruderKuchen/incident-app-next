@@ -1,4 +1,4 @@
-// pages/api/updateReport.js
+// pages/api/deleteReport.js
 import { MongoClient, ObjectId } from 'mongodb';
 const uri = process.env.MONGODB_URI;
 
@@ -7,21 +7,18 @@ export default async function handler(req, res) {
     res.setHeader('Allow', ['POST']);
     return res.status(405).json({ error: `Method ${req.method} Not Allowed` });
   }
-  const { id, status } = req.body;
-  if (!id || !status) return res.status(400).json({ error: 'Missing id or status' });
+  const { id } = req.body;
+  if (!id) return res.status(400).json({ error: 'Missing id' });
 
   try {
     const client = new MongoClient(uri);
     await client.connect();
     const db = client.db('incidentsDB');
-    await db.collection('reports').updateOne(
-      { _id: new ObjectId(id) },
-      { $set: { status } }
-    );
+    await db.collection('reports').deleteOne({ _id: new ObjectId(id) });
     await client.close();
-    return res.status(200).json({ message: 'Status aktualisiert' });
+    return res.status(200).json({ message: 'Deleted' });
   } catch (e) {
     console.error(e);
-    return res.status(500).json({ error: 'Fehler beim Aktualisieren' });
+    return res.status(500).json({ error: 'Error deleting' });
   }
 }

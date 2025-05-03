@@ -7,7 +7,7 @@ export default function Reports() {
 
   useEffect(() => {
     fetch('/api/getReports')
-      .then(r => r.json())
+      .then(res => res.json())
       .then(data => setAllReports(data));
   }, []);
 
@@ -17,25 +17,29 @@ export default function Reports() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id, status })
     });
-    setAllReports(reports =>
-      reports.map(r => (r._id === id ? { ...r, status } : r))
-    );
+    setAllReports(rs => rs.map(r => (r._id === id ? { ...r, status } : r)));
   };
 
-  // Filter anwenden
-  const reports = allReports
-    .filter(r =>
-      (filter.category === '' || r.category === filter.category) &&
-      (r.title.toLowerCase().includes(filter.text.toLowerCase()) ||
-       r.description.toLowerCase().includes(filter.text.toLowerCase()))
-    );
+  const deleteReport = async id => {
+    if (!confirm('Wirklich löschen?')) return;
+    await fetch('/api/deleteReport', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id })
+    });
+    setAllReports(rs => rs.filter(r => r._id !== id));
+  };
+
+  const reports = allReports.filter(r =>
+    (filter.category === '' || r.category === filter.category) &&
+    (r.title.toLowerCase().includes(filter.text.toLowerCase()) ||
+     r.description.toLowerCase().includes(filter.text.toLowerCase()))
+  );
 
   return (
     <div className="min-h-screen bg-gray-100 p-4">
       <div className="max-w-4xl mx-auto bg-white p-6 rounded shadow">
         <h1 className="text-2xl font-bold mb-4">Gemeldete Incidents</h1>
-
-        {/* Suche & Kategorie */}
         <div className="flex flex-col sm:flex-row sm:space-x-4 mb-6">
           <input
             type="text"
@@ -56,25 +60,23 @@ export default function Reports() {
           </select>
         </div>
 
-        {/* Liste */}
         {reports.length === 0 ? (
           <p className="text-gray-600">Keine Meldungen gefunden.</p>
         ) : (
           <ul className="space-y-4">
             {reports.map(r => (
-              <li key={r._id} className="border-b pb-4">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <p><span className="font-semibold">Titel:</span> {r.title}</p>
-                    <p><span className="font-semibold">Kategorie:</span> {r.category}</p>
-                    <p><span className="font-semibold">Beschreibung:</span> {r.description}</p>
-                    <p className="text-sm text-gray-500">
-                      <span className="font-semibold">Erstellt am:</span>{' '}
-                      {new Date(r.date).toLocaleString()}
-                    </p>
-                  </div>
+              <li key={r._id} className="border-b pb-4 flex justify-between">
+                <div>
+                  <p><strong>Titel:</strong> {r.title}</p>
+                  <p><strong>Kategorie:</strong> {r.category}</p>
+                  <p><strong>Beschreibung:</strong> {r.description}</p>
+                  <p className="text-sm text-gray-500">
+                    <strong>Erstellt am:</strong> {new Date(r.date).toLocaleString()}
+                  </p>
+                </div>
+                <div className="flex items-start">
                   <select
-                    className="ml-4 p-1 border rounded"
+                    className="mr-2 p-1 border rounded"
                     value={r.status}
                     onChange={e => updateStatus(r._id, e.target.value)}
                   >
@@ -82,6 +84,12 @@ export default function Reports() {
                     <option value="In Bearbeitung">In Bearbeitung</option>
                     <option value="Gelöst">Gelöst</option>
                   </select>
+                  <button
+                    className="text-red-600 hover:underline"
+                    onClick={() => deleteReport(r._id)}
+                  >
+                    Löschen
+                  </button>
                 </div>
               </li>
             ))}

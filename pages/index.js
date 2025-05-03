@@ -1,5 +1,6 @@
 // pages/index.js
 import { useState } from 'react';
+import Link from 'next/link';
 
 export default function Home() {
   const [form, setForm] = useState({ title: '', description: '', category: '' });
@@ -12,32 +13,25 @@ export default function Home() {
   const handleSubmit = async e => {
     e.preventDefault();
     setStatusMsg('… speichere');
-  
     try {
       const res = await fetch('/api/report', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form)
       });
-  
-      // Prüfe HTTP-Status
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        console.error('API-Fehler:', err);
         setStatusMsg(err.error || `Fehler ${res.status}`);
         return;
       }
-  
       const data = await res.json();
-      console.log('API-Erfolg:', data);
       setStatusMsg(data.message || 'Gespeichert!');
       setForm({ title: '', description: '', category: '' });
-  
     } catch (networkError) {
-      console.error('Netzwerkfehler:', networkError);
       setStatusMsg('Netzwerkfehler – bitte prüfe Konsole');
     }
-  };  
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
       <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow-md w-full max-w-lg">
@@ -75,6 +69,11 @@ export default function Home() {
         </button>
         {statusMsg && <p className="mt-2 text-center">{statusMsg}</p>}
       </form>
+      <div className="mt-4 text-center w-full max-w-lg">
+        <Link href="/reports">
+          <a className="text-blue-600 hover:underline">→ Alle Incidents ansehen</a>
+        </Link>
+      </div>
     </div>
   );
 }
