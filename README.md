@@ -1,5 +1,3 @@
-Thought for a second
-
 
 ```markdown
 # IncidentApp-Next
