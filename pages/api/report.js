@@ -3,7 +3,7 @@ import { MongoClient } from 'mongodb';
 const uri = process.env.MONGODB_URI;
 
 export default async function handler(req, res) {
-  // 1) Preflight OPTIONS beantworten
+  // Preflight für CORS
   if (req.method === 'OPTIONS') {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS');
@@ -11,24 +11,25 @@ export default async function handler(req, res) {
     return res.status(200).json({});
   }
 
-  // 2) CORS-Header für POST
+  // CORS-Header für alle Antworten
   res.setHeader('Access-Control-Allow-Origin', '*');
 
-  // 3) Nur POST zulassen
+  // Nur POST erlaubt
   if (req.method !== 'POST') {
     res.setHeader('Allow', ['POST', 'OPTIONS']);
     return res.status(405).json({ error: `Method ${req.method} Not Allowed` });
   }
 
-  // 4) Request-Body prüfen
+  // Body validieren
   const { title, description, category } = req.body;
   if (!title || !description || !category) {
     return res.status(400).json({ error: 'Alle Felder sind erforderlich.' });
   }
 
-  // 5) In DB speichern
+  // In MongoDB speichern
+  let client;
   try {
-    const client = new MongoClient(uri);
+    client = new MongoClient(uri);
     await client.connect();
     const db = client.db('incidentsDB');
     await db.collection('reports').insertOne({
@@ -38,10 +39,11 @@ export default async function handler(req, res) {
       date: new Date().toISOString(),
       status: 'Offen'
     });
-    await client.close();
     return res.status(200).json({ message: 'Gespeichert' });
   } catch (e) {
-    console.error('DB-Error:', e);
+    console.error('DB-Error /api/report:', e);
     return res.status(500).json({ error: 'Fehler beim Speichern' });
+  } finally {
+    if (client) await client.close();
   }
 }
