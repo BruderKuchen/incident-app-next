@@ -3,14 +3,14 @@ applications:
   - frontend:
       framework: nextjs
       features:
-        ssr: true           # aktiviert Server-Side-Rendering und API-Routen
+        ssr: true
       phases:
         preBuild:
           commands:
-            - npm install    # installiert deine Dependencies
+            - npm install
         build:
           commands:
-            - npm run build  # baut dein Next.js-Projekt
+            - npm run build
       artifacts:
         baseDirectory: .next
         files:
