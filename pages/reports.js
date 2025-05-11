@@ -1,6 +1,7 @@
 // pages/reports.js
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import EscalateButton from '../components/EscalateButton'
 
 export default function Reports() {
   const [allReports, setAllReports] = useState([])
@@ -108,24 +109,18 @@ export default function Reports() {
                 className="border-b pb-4 flex justify-between items-start"
               >
                 <div>
-                  <p>
-                    <strong>Titel:</strong> {r.title}
-                  </p>
-                  <p>
-                    <strong>Kategorie:</strong> {r.category}
-                  </p>
-                  <p>
-                    <strong>Beschreibung:</strong> {r.description}
-                  </p>
+                  <p><strong>Titel:</strong> {r.title}</p>
+                  <p><strong>Kategorie:</strong> {r.category}</p>
+                  <p><strong>Beschreibung:</strong> {r.description}</p>
                   <p className="text-sm text-gray-500">
                     <strong>Erstellt am:</strong>{' '}
                     {new Date(r.date).toLocaleString()}
                   </p>
                 </div>
-                <div className="flex items-start">
+                <div className="flex items-start space-x-2">
                   {/* Status-Dropdown */}
                   <select
-                    className="mr-2 p-1 border rounded"
+                    className="p-1 border rounded"
                     value={r.status}
                     onChange={e => updateStatus(r._id, e.target.value)}
                   >
@@ -133,6 +128,7 @@ export default function Reports() {
                     <option value="In Bearbeitung">In Bearbeitung</option>
                     <option value="Gelöst">Gelöst</option>
                   </select>
+
                   {/* Löschen */}
                   <button
                     className="text-red-600 hover:underline"
@@ -140,6 +136,9 @@ export default function Reports() {
                   >
                     Löschen
                   </button>
+
+                  {/* Escalate-Button */}
+                  <EscalateButton incidentId={r._id} />
                 </div>
               </li>
             ))}
