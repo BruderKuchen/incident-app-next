@@ -92,3 +92,13 @@ Eine Next.js-App zum Erfassen, Anzeigen, Filtern, Aktualisieren und Löschen von
 
 ```
 ```
+
+
+## 🔧 Environment Variables
+
+Erstelle eine `.env.local` im Projekt-Root mit den folgenden Variablen:
+
+```env
+MONGODB_URI=<Dein MongoDB Connection String>
+ESCALATION_API_URL=<Deine API Gateway URL, z.B. https://.../prod/escalate>
+```
