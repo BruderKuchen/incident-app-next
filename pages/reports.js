@@ -1,7 +1,7 @@
 // pages/reports.js
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import EscalateButton from '../components/EscalateButton'
+import EscalateButton from '../pages/api/escalate'
 
 export default function Reports() {
   const [allReports, setAllReports] = useState([])
