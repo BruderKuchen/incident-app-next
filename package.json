@@ -10,7 +10,9 @@
     "next": "latest",
     "react": "latest",
     "react-dom": "latest",
-    "mongodb": "^5.7.0"
+    "mongodb": "^5.7.0",
+    "pg": "^8.10.0",
+    "ioredis": "^5.3.2"
   },
   "devDependencies": {
     "tailwindcss": "^3.4.0",
